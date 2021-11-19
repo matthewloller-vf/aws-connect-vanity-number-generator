@@ -12,8 +12,8 @@ winston.configure({
 });
 
 export const handler = async (event: ConnectContactFlowEvent, ctx: Context, cb: ConnectContactFlowCallback) => {
-  const callerNumber = event.Details.ContactData.CustomerEndpoint?.Address;
-  winston.info('received connect contact flow event', { callerNumber });
+  winston.debug('received connect contact flow event', event);
+  const callerNumber = event.Details.ContactData.CustomerEndpoint?.Address ?? '';
 
   if (!callerNumber) {
     winston.error('received contact flow event with no valid customer phone number');
@@ -26,22 +26,19 @@ export const handler = async (event: ConnectContactFlowEvent, ctx: Context, cb: 
   const vanityNumbers = generateVanityNumbers(callerNumber);
   winston.info('generated vanity numbers', { vanityNumbers });
 
+  const dbVanityNumbers = vanityNumbers.reduce((a, v, i) => ({ ...a, [`vanityNumber${i + 1}`]: { S: v } }), {});
+
   const dbItem = {
     phoneNumber: { S: callerNumber },
-    vanityNumber1: { S: vanityNumbers[0] },
-    vanityNumber2: { S: vanityNumbers[1] },
-    vanityNumber3: { S: vanityNumbers[2] },
-    vanityNumber4: { S: vanityNumbers[3] },
-    vanityNumber5: { S: vanityNumbers[4] },
+    ...dbVanityNumbers,
   };
 
-  const putItemCommand = new PutItemCommand({
-    TableName: process.env.VANITY_TABLE_NAME,
-    Item: dbItem,
-  });
+  const putItemCommand = new PutItemCommand({ TableName: process.env.VANITY_TABLE_NAME, Item: dbItem });
 
   winston.debug('updating database with vanity number collection');
-  const result = await dynamodb.send(putItemCommand);
+  await dynamodb.send(putItemCommand);
 
-  return vanityNumbers;
+  const resultVanityNumbers = vanityNumbers.reduce((a, v, i) => ({ ...a, [`vanityNumber${i + 1}`]: v }), {});
+
+  cb(null, resultVanityNumbers);
 };
