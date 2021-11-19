@@ -23,6 +23,7 @@ export class VanityNumberGeneratorStack extends cdk.Stack {
       bundling: { sourceMap: true, minify: true },
       environment: {
         VANITY_TABLE_NAME: vanityNumberTable.tableName,
+        LOG_LEVEL: 'debug', // this should be determined by environment
       },
     });
     vanityNumberTable.grantReadWriteData(vanityConverterLambda);
