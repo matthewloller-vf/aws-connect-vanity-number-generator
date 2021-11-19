@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
+import 'tsconfig-paths/register';
 import * as cdk from '@aws-cdk/core';
 import VanityNumberGeneratorStack from '@stacks/vanity-number-generator';
 
