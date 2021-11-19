@@ -1,0 +1,97 @@
+{
+  "modules": [
+    {
+      "id": "dbc7d280-da92-477c-a3d0-70d5001e4bd6",
+      "type": "SetLoggingBehavior",
+      "branches": [{ "condition": "Success", "transition": "3daa0eb2-0fde-4d35-bf85-77ea2445300a" }],
+      "parameters": [{ "name": "LoggingBehavior", "value": "Enable" }],
+      "metadata": { "position": { "x": 187, "y": 19 } }
+    },
+    {
+      "id": "3daa0eb2-0fde-4d35-bf85-77ea2445300a",
+      "type": "SetVoice",
+      "branches": [{ "condition": "Success", "transition": "ee515618-3097-4d1e-b257-28c2535d0e3a" }],
+      "parameters": [{ "name": "GlobalVoice", "value": "Matthew" }],
+      "metadata": { "position": { "x": 430, "y": 18 }, "overrideConsoleVoice": false, "defaultVoice": "Conversational" }
+    },
+    {
+      "id": "ee515618-3097-4d1e-b257-28c2535d0e3a",
+      "type": "PlayPrompt",
+      "branches": [{ "condition": "Success", "transition": "b991d68d-6c58-496b-99ef-d334fb88dac3" }],
+      "parameters": [
+        {
+          "name": "Text",
+          "value": "Welcome to the vanity number generator! Please stand by while we generate your vanity phone numbers.",
+          "namespace": null
+        },
+        { "name": "TextToSpeechType", "value": "text" }
+      ],
+      "metadata": { "position": { "x": 80, "y": 221 }, "useDynamic": false }
+    },
+    {
+      "id": "b991d68d-6c58-496b-99ef-d334fb88dac3",
+      "type": "InvokeExternalResource",
+      "branches": [
+        { "condition": "Success", "transition": "f668ed6c-23af-418b-94e1-fdd9245bcdaa" },
+        { "condition": "Error", "transition": "1cc4bca2-5900-4cd8-aa03-27ba573a61e1" }
+      ],
+      "parameters": [
+        {
+          "name": "FunctionArn",
+          "value": "arn:aws:lambda:us-east-1:508303515071:function:vanity-number-generator",
+          "namespace": null
+        },
+        { "name": "TimeLimit", "value": "5" }
+      ],
+      "metadata": { "position": { "x": 319, "y": 266 }, "dynamicMetadata": {}, "useDynamic": false },
+      "target": "Lambda"
+    },
+    {
+      "id": "f668ed6c-23af-418b-94e1-fdd9245bcdaa",
+      "type": "PlayPrompt",
+      "branches": [{ "condition": "Success", "transition": "fa43a0d3-94f8-40c5-9251-b3e71811c6da" }],
+      "parameters": [
+        {
+          "name": "Text",
+          "value": "Thanks for your patience! I've generated 3 vanity numbers for you. The first vanity number is $.External.vanityNumber1. The second vanity number is $.External.vanityNumber2. And the third vanity number is $.External.vanityNumber3",
+          "namespace": null
+        },
+        { "name": "TextToSpeechType", "value": "text" }
+      ],
+      "metadata": { "position": { "x": 558, "y": 242 }, "useDynamic": true }
+    },
+    {
+      "id": "1cc4bca2-5900-4cd8-aa03-27ba573a61e1",
+      "type": "PlayPrompt",
+      "branches": [{ "condition": "Success", "transition": "fa43a0d3-94f8-40c5-9251-b3e71811c6da" }],
+      "parameters": [
+        {
+          "name": "Text",
+          "value": "There was an issue generating your vanity numbers. Please stand by while we connect you with an agent.",
+          "namespace": null
+        },
+        { "name": "TextToSpeechType", "value": "text" }
+      ],
+      "metadata": { "position": { "x": 554, "y": 402 }, "useDynamic": false }
+    },
+    {
+      "id": "fa43a0d3-94f8-40c5-9251-b3e71811c6da",
+      "type": "Disconnect",
+      "branches": [],
+      "parameters": [],
+      "metadata": { "position": { "x": 788, "y": 394 } }
+    }
+  ],
+  "version": "1",
+  "start": "dbc7d280-da92-477c-a3d0-70d5001e4bd6",
+  "metadata": {
+    "entryPointPosition": { "x": 20, "y": 20 },
+    "snapToGrid": false,
+    "name": "Vanity Generator",
+    "description": null,
+    "type": "contactFlow",
+    "status": "saved",
+    "hash": "f52a637b6358e5394d288a9ecd1883fbf10248d1f44edf7d4c009562cb388744"
+  },
+  "type": "contactFlow"
+}
