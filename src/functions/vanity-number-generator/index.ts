@@ -1,7 +1,7 @@
 import { ConnectContactFlowEvent, Context, ConnectContactFlowCallback } from 'aws-lambda';
 import { DynamoDB, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { generateVanityNumbers } from '@libs/vanity-number-generator';
 import winston from 'winston';
-import { generateVanityNumbers } from './vanity-number-generator';
 
 // json logger used for cloudwatch logs
 winston.configure({
