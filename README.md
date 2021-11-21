@@ -38,4 +38,4 @@ The following steps should get your environment set up and allow you to build an
 
 ## Testing
 
-* `npm run teste` - execute the jest tests
+* `npm run test` - execute the jest tests
