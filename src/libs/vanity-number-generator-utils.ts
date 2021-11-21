@@ -1,5 +1,5 @@
 import words from 'an-array-of-english-words';
-import { format, parsePhoneNumber } from 'libphonenumber-js';
+import { parsePhoneNumber } from 'libphonenumber-js';
 
 const NUM_MAP = [
   ['0'],
@@ -18,7 +18,7 @@ const NUM_MAP = [
  * Generates a list of potential vanity phone numbers based on an input phone number
  * @param {string} phoneNumber phone number to generator vanity numbers for
  * @param {number} count number of vanity numbers to generate
- * @return {*}  {string[]}
+ * @return {*}  {string[]} list of vanity numbers
  */
 function generateVanityNumbers(phoneNumber: string, count?: 5): string[] {
   let vanityNumbers = [];
@@ -64,7 +64,12 @@ function generateVanityNumbers(phoneNumber: string, count?: 5): string[] {
   console.log(returnNumbers);
   return returnNumbers;
 }
-
+/**
+ * Creates a vanity phone number string from a phonenumber and vanity word
+ * @param {string} phoneNumber phone number to add vanity word to
+ * @param {string} word 4-letter word to replace the last 4 digits of phone number with
+ * @return {*}  {string} vanity number
+ */
 function buildVanityNumber(phoneNumber: string, word: string): string {
   let vanityNumber = parsePhoneNumber(phoneNumber).format('INTERNATIONAL');
   return vanityNumber.substr(0, vanityNumber.length - 4) + word;
