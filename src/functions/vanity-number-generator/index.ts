@@ -1,6 +1,7 @@
 import { ConnectContactFlowEvent, Context, ConnectContactFlowCallback } from 'aws-lambda';
 import { DynamoDB, PutItemCommand } from '@aws-sdk/client-dynamodb';
 import { generateVanityNumbers } from '@libs/vanity-number-generator-utils';
+import { isValidNumber } from 'libphonenumber-js';
 import winston from 'winston';
 
 // json logger used for cloudwatch logs
@@ -21,8 +22,6 @@ export const handler = async (event: ConnectContactFlowEvent, ctx: Context, cb: 
     return;
   }
 
-  const dynamodb = new DynamoDB({});
-
   const vanityNumbers = generateVanityNumbers(callerNumber);
   winston.info('generated vanity numbers', { vanityNumbers });
 
@@ -38,6 +37,7 @@ export const handler = async (event: ConnectContactFlowEvent, ctx: Context, cb: 
   winston.debug('updating database with vanity number collection');
 
   try {
+    const dynamodb = new DynamoDB({});
     await dynamodb.send(putItemCommand);
   } catch (err) {
     winston.error('database error', err);
