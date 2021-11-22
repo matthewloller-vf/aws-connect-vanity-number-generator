@@ -2,6 +2,8 @@ import * as cdk from '@aws-cdk/core';
 import * as dynamodb from '@aws-cdk/aws-dynamodb';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as lambdaNode from '@aws-cdk/aws-lambda-nodejs';
+import * as apigateway from '@aws-cdk/aws-apigateway';
+import { IFunction } from '@aws-cdk/aws-lambda';
 
 export class VanityNumberGeneratorStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -27,5 +29,29 @@ export class VanityNumberGeneratorStack extends cdk.Stack {
       },
     });
     vanityNumberTable.grantReadWriteData(vanityConverterLambda);
+
+    const vanityNumberViewLambda = new lambdaNode.NodejsFunction(this, 'VanityNumberViewerLambda', {
+      functionName: 'vanity-number-viewer',
+      description: 'Receives an api gateway event and generates an html response with a vanity number table',
+      entry: 'src/functions/vanity-number-viewr/index.ts',
+      runtime: lambda.Runtime.NODEJS_14_X,
+      timeout: cdk.Duration.seconds(10),
+      bundling: { sourceMap: true, minify: true },
+      role: undefined,
+      environment: {
+        VANITY_TABLE_NAME: vanityNumberTable.tableName,
+        LOG_LEVEL: 'debug', // this should be determined by environment
+      },
+    });
+    vanityNumberTable.grantReadData(vanityNumberViewLambda);
+
+    const api = new apigateway.LambdaRestApi(this, 'VanityNumberViewerApi', {
+      handler: vanityNumberViewLambda,
+      restApiName: 'Vanity Number Viewer API V1',
+      description: 'Returns the last 5 vanity number lists generated',
+    });
+
+    const vanityNumberTableResourcePath = api.root.addResource('vanity-number').addResource('table');
+    vanityNumberTableResourcePath.addMethod('GET');
   }
 }
