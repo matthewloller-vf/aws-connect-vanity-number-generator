@@ -1,0 +1,25 @@
+name: CI/CD
+
+on: [push, workflow_dispatch, pull_request]
+
+jobs:
+  deploy:
+    name: Build
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v2
+
+      - name: Initialize Node Environment
+        uses: ./.github/actions/init-node-project
+        with:
+          nodeVersion: 14.x
+          runTests: true
+
+      - name: Deploy
+        if: env.DEPLOY == 'true'
+        run: npx cdk deploy 
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: 'us-east-1'

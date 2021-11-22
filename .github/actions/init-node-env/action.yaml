@@ -1,0 +1,36 @@
+name: Initialize Node Project
+description: Initializes a node project with the specified node version, checks out repo, caches and install packages
+
+inputs:
+  nodeVersion:
+   description: Nodejs Version (ex. 14.x)
+   required: true
+   default: 14.x
+  runTests:
+    description: Run 'npm test'
+    required: false
+    default: 'true'
+
+runs:
+  using: composite
+  steps:
+    - name: Use Node.js ${{ inputs.nodeVersion }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ inputs.nodeVersion }}
+
+    - name: Cache/Restore Node Modules
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: '**/node_modules'
+        key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+    
+    - name: Install Dependencies
+      shell: bash
+      run: |
+        [[ "${{ steps.cache.outputs.cache-hit }}" = true ]] || npm ci
+    - name: Run Tests
+      shell: bash
+      run: |
+        [[ "${{ inputs.runTests }}" = "true" ]] && npm test
