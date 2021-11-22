@@ -39,3 +39,18 @@ The following steps should get your environment set up and allow you to build an
 ## Testing
 
 * `npm run test` - execute the jest tests
+
+## AWS Connect Setup
+
+The main lambda function created in this stack is intended to be used in an Amazon Connect instance. The following steps provide details on how to set up the Amazon Connect instance and configure your contact flow to use the vanity generator lambda function.
+
+1. Navigate to Amazon Connect in AWS and following the wizard to set up your connect instance.
+2. Select your instance once created and select the **Contact Flows** navigation on the left hand side.
+3. Scroll down on the page until you see the section regarding lamba's.
+4. From the dropdown select your vanity generator lambda function and click add lambda function.
+> Note: this allows your Amazon Connect instance permissions to invoke the lambda function.
+5. Navigate back to your connect instance overview and click on the **Access Url**.
+6. Once inside your Amazon Connect instance log in using your admin credentials from the setup wizard.
+7. On the left hand side navigate to the contact flows page and add a new contact flow.
+8. Once inside the contact flow editor import the contact flow located [here](./contact-flows/vanity-generator-contact-flow.json)
+9. From there you can associate your contact flow with a phone number (if created).
