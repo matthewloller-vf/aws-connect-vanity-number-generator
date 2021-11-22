@@ -36,7 +36,17 @@ export class VanityNumberGeneratorStack extends cdk.Stack {
       entry: 'src/functions/vanity-number-viewer/index.ts',
       runtime: lambda.Runtime.NODEJS_14_X,
       timeout: cdk.Duration.seconds(10),
-      bundling: { sourceMap: true, minify: true },
+      bundling: {
+        sourceMap: true,
+        minify: true,
+        commandHooks: {
+          beforeBundling: (inputDir, outDir) => {
+            return [`cp ${inputDir}/src/functions/vanity-number-viewer/index.html ${outDir}/index.html`];
+          },
+          afterBundling: () => [],
+          beforeInstall: () => [],
+        },
+      },
       role: undefined,
       environment: {
         VANITY_TABLE_NAME: vanityNumberTable.tableName,
