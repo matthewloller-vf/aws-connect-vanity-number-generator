@@ -1,7 +1,7 @@
 import { ConnectContactFlowEvent, Context, ConnectContactFlowCallback } from 'aws-lambda';
 import { DynamoDB, PutItemCommand } from '@aws-sdk/client-dynamodb';
 import { generateVanityNumbers } from '@libs/vanity-number-generator-utils';
-import { isValidNumber } from 'libphonenumber-js';
+import moment from 'moment';
 import winston from 'winston';
 
 // json logger used for cloudwatch logs
@@ -29,6 +29,7 @@ export const handler = async (event: ConnectContactFlowEvent, ctx: Context, cb: 
 
   const dbItem = {
     phoneNumber: { S: callerNumber },
+    updated: { N: moment().unix().toString() },
     ...dbVanityNumbers,
   };
 
