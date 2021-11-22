@@ -3,7 +3,6 @@ import * as dynamodb from '@aws-cdk/aws-dynamodb';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as lambdaNode from '@aws-cdk/aws-lambda-nodejs';
 import * as apigateway from '@aws-cdk/aws-apigateway';
-import { IFunction } from '@aws-cdk/aws-lambda';
 
 export class VanityNumberGeneratorStack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -12,6 +11,7 @@ export class VanityNumberGeneratorStack extends cdk.Stack {
     const vanityNumberTable = new dynamodb.Table(this, 'VanityNumberDynamodbTable', {
       tableName: 'vanity-numbers',
       partitionKey: { name: 'phoneNumber', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'updated', type: dynamodb.AttributeType.NUMBER },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
@@ -33,7 +33,7 @@ export class VanityNumberGeneratorStack extends cdk.Stack {
     const vanityNumberViewLambda = new lambdaNode.NodejsFunction(this, 'VanityNumberViewerLambda', {
       functionName: 'vanity-number-viewer',
       description: 'Receives an api gateway event and generates an html response with a vanity number table',
-      entry: 'src/functions/vanity-number-viewr/index.ts',
+      entry: 'src/functions/vanity-number-viewer/index.ts',
       runtime: lambda.Runtime.NODEJS_14_X,
       timeout: cdk.Duration.seconds(10),
       bundling: { sourceMap: true, minify: true },
@@ -49,9 +49,13 @@ export class VanityNumberGeneratorStack extends cdk.Stack {
       handler: vanityNumberViewLambda,
       restApiName: 'Vanity Number Viewer API V1',
       description: 'Returns the last 5 vanity number lists generated',
+      proxy: false,
+      deployOptions: {
+        stageName: 'dev',
+      },
     });
 
-    const vanityNumberTableResourcePath = api.root.addResource('vanity-number').addResource('table');
+    const vanityNumberTableResourcePath = api.root.addResource('vanity-numbers');
     vanityNumberTableResourcePath.addMethod('GET');
   }
 }

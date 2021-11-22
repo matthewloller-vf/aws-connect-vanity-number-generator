@@ -13,11 +13,16 @@ winston.configure({
 export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
   winston.debug('received api gateway event', event);
 
-  const scanCommand = new ScanCommand({ TableName: process.env.VANITY_TABLE_NAME, Limit: 5 });
+  const scanCommand = new ScanCommand({
+    TableName: process.env.VANITY_TABLE_NAME,
+  });
 
   try {
     const dynamodb = new DynamoDB({});
     var response = await dynamodb.send(scanCommand);
+
+    response.Items?.sort((a, b) => parseInt(b.updated.N ?? '') - parseInt(a.updated.N ?? '')).slice(0, 5);
+
     winston.info(response);
     return {
       statusCode: 200,
