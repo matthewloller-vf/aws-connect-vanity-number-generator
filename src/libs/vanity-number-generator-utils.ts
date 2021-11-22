@@ -72,7 +72,7 @@ function generateVanityNumbers(phoneNumber: string, count?: 5): string[] {
  */
 function buildVanityNumber(phoneNumber: string, word: string): string {
   let vanityNumber = parsePhoneNumber(phoneNumber).format('INTERNATIONAL');
-  return vanityNumber.substr(0, vanityNumber.length - 4) + word;
+  return (vanityNumber.substr(0, vanityNumber.length - 4) + word).replace(' ', '');
 }
 
 export { generateVanityNumbers };
