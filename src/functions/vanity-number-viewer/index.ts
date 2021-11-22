@@ -1,6 +1,8 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { DynamoDB, ScanCommand } from '@aws-sdk/client-dynamodb';
+import { APIGatewayProxyCallback, APIGatewayProxyEvent, APIGatewayProxyResult, Context } from 'aws-lambda';
+import { DynamoDB, ScanCommand, ScanCommandOutput } from '@aws-sdk/client-dynamodb';
 import winston from 'winston';
+import cheerio from 'cheerio';
+import { readFileSync } from 'fs';
 
 // json logger used for cloudwatch logs
 winston.configure({
@@ -23,10 +25,27 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     response.Items?.sort((a, b) => parseInt(b.updated.N ?? '') - parseInt(a.updated.N ?? '')).slice(0, 5);
 
-    winston.info(response);
+    const $ = cheerio.load(readFileSync('./index.html'));
+
+    for (const item of response.Items ?? []) {
+      $('#vanityNumberTable > tbody').append(
+        `<tr>
+            <td>${item.phoneNumber?.S}</td>
+            <td>${item.vanityNumber1?.S}</td>
+            <td>${item.vanityNumber2?.S}</td>
+            <td>${item.vanityNumber3?.S}</td>
+            <td>${item.vanityNumber4?.S}</td>
+            <td>${item.vanityNumber5?.S}</td>
+         </tr>`
+      );
+    }
+
     return {
       statusCode: 200,
-      body: JSON.stringify({ items: response.Items }),
+      body: $.html(),
+      headers: {
+        'Content-Type': 'text/html',
+      },
     };
   } catch (err) {
     winston.error('database error', err);
