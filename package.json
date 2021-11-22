@@ -6,10 +6,10 @@
     "vanity-number-generator": "index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "cdk synth",
+    "deploy": "cdk deploy",
     "watch": "tsc -w",
-    "test": "jest",
-    "cdk": "cdk"
+    "test": "jest"
   },
   "devDependencies": {
     "@aws-cdk/assertions": "^1.133.0",
