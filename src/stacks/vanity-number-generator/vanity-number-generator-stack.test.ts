@@ -11,11 +11,19 @@ beforeAll(() => {
 });
 
 test('Vanity Number Generator Lambda Function Created', () => {
-  template.hasResource('AWS::Lambda::Function', {});
+  template.hasResourceProperties('AWS::Lambda::Function', { FunctionName: 'vanity-number-generator' });
+});
+
+test('Vanity Number Viewer Lambda Function Created', () => {
+  template.hasResourceProperties('AWS::Lambda::Function', { FunctionName: 'vanity-number-viewer' });
 });
 
 test('Vanity Number Dynamodb Table Created', () => {
-  template.hasResource('AWS::DynamoDB::Table', {});
+  template.hasResourceProperties('AWS::DynamoDB::Table', { TableName: 'vanity-numbers' });
+});
+
+test('Vanity Number Viewer Rest Api Created', () => {
+  template.hasResourceProperties('AWS::ApiGateway::RestApi', { Name: 'Vanity Number Viewer API V1' });
 });
 
 // TODO: add testing for correct permissions on the lambda function to write to dynamodb
