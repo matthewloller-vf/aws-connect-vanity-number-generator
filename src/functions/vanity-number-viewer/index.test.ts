@@ -29,3 +29,5 @@ describe('Vanity Generator Viewer', () => {
     expect(response.statusCode).toBe(400);
   });
 });
+
+// Hey Jon! Looks like when Alice left the zoom it killed the meeting. Was great chatting with you!
